@@ -1,0 +1,8 @@
+---
+- name: Restart tomcat 
+  shell: sh {{INSTALL_DIR}}/tomcat-initscript.sh restart
+   
+  
+- name: Start Tomcat
+  shell: sh {{INSTALL_DIR}}/tomcat-initscript.sh start
+   

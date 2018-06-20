@@ -1,0 +1,47 @@
+# Here are variables related to the Tomcat installation
+INSTALL_DIR: /tools/list/product
+HTTPD_DOWNLOADS: http://apache.mediamirrors.org//httpd/httpd-2.4.29.tar.gz
+APR_DOWNLOADS: http://apache.mirrors.ovh.net/ftp.apache.org/dist//apr/apr-1.6.3.tar.gz
+APR_UTIL_DOWNLOADS: http://apache.mirrors.ovh.net/ftp.apache.org/dist//apr/apr-util-1.6.1.tar.gz
+HTTPD_VERSION: 2.4.29
+JRE_URL: http://download.oracle.com/otn-pub/java/jdk/8u151-b12/e758a0de34e24606bca991d704f6dcbf/jre-8u151-linux-x64.tar.gz
+MOD_JK_URL: http://apache.mediamirors.org/tomcat/tomcat-connectors/jk/tomcat-connectors-1.2.42-src.tar.gz
+OPEN_SSL_URL: https://www.openssl.org/source/openssl-1.0.2m.tar.gz
+URL_DOWNLOADS_MOD_SEC: https://www.modsecurity.org/tarball/2.9.2/modsecurity-2.9.2.tar.gz
+TOMCAT_CONNECTOR_VERSION: 1.2.42
+TOMCAT_HTTP_URL:  http://apache.mediamirrors.org/tomcat/tomcat-8/v8.5.24/bin/apache-tomcat-8.5.24.tar.gz
+HTTP_LOGS: /app/list/logs/http
+HTTP_PORT: 8080
+AJP_PORT : 8009
+PORT_SHUTDOWN : 8005
+TOMCAT_VERSION: 8.5.23
+ADDRESS_SERVICE: 192.168.1.65
+TOMCAT_PASSWORD: adminAife01$
+TOMCAT_USER: admin
+DIR_APP_CONFIG_NAME: /app/list/data/app/config
+INSTALLED_APPS: /app/list/data/installedApps
+TOMCAT_LOGS: /app/list/logs/tomcat
+APP_NAME: app-api
+INITIAL_HEAP_SIZE: Xms128m
+MAX_HEAP_SIZE: Xmx768m
+APP_SIZE: 52428800 
+db_name : jdbc/app
+db_driver : com.oracle.OracleDriver
+db_username : app
+db_password : PASSWORD01$
+db_url : jdbc:oracle:thin:@//@ADDRESS_MACHINE:1521/xe
+##configure app parameters
+CONTEXT_ROOT: /app
+jvmRoute : worker1
+###configure waf rp #####
+HTTPS_PORT: 443
+HOSTNAME_WAF: @ADRESS_HOST_WAF
+app_encoding: UTF-8
+### installation mail catcher 
+IP_ADDRESS_SMTP: @ADRESS_HOST_SMTP 
+##### installation oracle database 11gR2
+ORACLE_DB_URL: http://download.oracle.com/otn/linux/oracle11g/xe/oracle-xe-11.2.0-1.0.x86_64.rpm.zip
+ORACLE_XE_PASSWORD: appadm01$
+######## installation postgresql-9.6
+PGSQL_URL: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+APP_URL: http://@ADDRESS_NEXUS/app-api-front-0.2.0-20171204.104826-2-web.zip

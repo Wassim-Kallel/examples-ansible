@@ -1,0 +1,3 @@
+---
+- name: Restart tomcat 
+  command: sh {{INSTALL_DIR}}/{{DIR_APP_NAME}}/tomcat-initscript.sh restart

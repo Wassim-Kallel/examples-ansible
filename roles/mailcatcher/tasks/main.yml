@@ -1,0 +1,20 @@
+---
+- name: update centos 7 
+  command: yum update
+- name: install gcc gcc-c++
+  command: yum -y install gcc gcc-c++
+- name: install sqlite-devel ruby-devel
+  command: yum -y install sqlite-devel ruby-devel
+- name: install mailcatcher
+  command: gem install mailcatcher 
+- name: start mail catcher 
+  command: mailcatcher --ip {{IP_ADDRESS_SMTP}}
+  
+- name: allow http/smtp mail catcher call by all machines
+- command: firewall-cmd --zone=public --add-port=1080/tcp --permanent
+- command: firewall-cmd --zone=public --add-port=1025/tcp --permanent
+- command: firewall-cmd --zone=public --add-service=http --permanent
+- command: firewall-cmd --zone=public --add-service=smtp --permanent
+- command: firewall-cmd --reload
+
+  

@@ -1,0 +1,36 @@
+---
+- name: check install directory soft
+  stat: path={{INSTALL_DIR}}
+  register: st
+  
+- name: create install folder
+  file: path={{item}} state=directory
+  when: not st.stat.exists 
+  with_items: 
+     - "{{INSTALL_DIR}}"
+     - "/app/list/logs/http"
+     - "/app/list/logs/tomcat"
+     - "{{INSTALLED_APPS}}"
+  
+- name: Download JRE
+  get_url:
+    url: "{{ JRE_URL }}"
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: "/tmp/"
+  when: not st.stat.exists
+  
+- name: unarchive jre package 
+  unarchive: src=/tmp/jre-8u151-linux-x64.tar.gz dest={{INSTALL_DIR}}/ copy=no
+  when: not st.stat.exists
+  
+- name: deploy application
+  get_url:
+    url: "{{ APP_URL }}"
+    dest: "/tmp/"
+
+- name: unarchive application 
+  unarchive: src={{item}} dest={{INSTALLED_APPS}}/ copy=no
+  with_fileglob: 
+   - "/tmp/*.zip"
+
+  

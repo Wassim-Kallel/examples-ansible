@@ -1,0 +1,24 @@
+---
+- name: downloads postgresql server 
+  get_url: url={{PGSQL_URL}} dest=/tmp/
+  
+- name: install postgresql
+  command: rpm -ivh pgdg-centos96-9.6-3.noarch.rpm 
+  args: 
+    chdir: /tmp/
+
+- name: initdb command postgresql
+  command: postgresql96-setup initdb
+  args: 
+    chdir: /usr/pgsql-9.6/bin
+
+- name: create service postgresql 
+  command: systemctl start postgresql-9.6.service 
+
+- name: enable to start postgresql in start OS 
+  command: systemctl enable postgresql-9.6.service
+  
+- name: update firewalld 
+  command: firewall-cmd --zone=public --add-port=5432/tcp --permanent
+- command: firewall-cmd --reload
+

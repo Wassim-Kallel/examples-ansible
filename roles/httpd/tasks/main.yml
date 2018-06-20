@@ -1,0 +1,109 @@
+- name: Check Exists apache2.4
+  stat: path={{INSTALL_DIR}}/apache2.4.29/bin
+  register: st
+  
+- name: create folder apache2
+  file: path={{item}} state=directory 
+  with_items:
+     - "/tmp/apache2.4"
+     - "{{HTTP_LOGS}}" 
+  when: not st.stat.exists
+    
+- name: downloads httpd tar gz file
+  get_url: url={{item}} dest=/tmp/apache2.4/
+  when: not st.stat.exists
+  with_items : 
+      - "{{HTTPD_DOWNLOADS}}"
+      - "{{APR_DOWNLOADS}}"
+      - "{{APR_UTIL_DOWNLOADS}}"
+ 
+- name: extract all archives 
+  unarchive: src={{item}}  copy=no dest=/tmp/apache2.4/
+  when: not st.stat.exists
+  with_items:
+     - "/tmp/apache2.4/apr-1.6.3.tar.gz"
+     - "/tmp/apache2.4/apr-util-1.6.1.tar.gz"
+     - "/tmp/apache2.4/httpd-2.4.29.tar.gz"
+     
+- name: delete all tar.gz files
+  command: rm {{item}}
+  args:
+   chdir: /tmp/apache2.4 
+  with_items:
+     - "apr-1.6.3.tar.gz"
+     - "apr-util-1.6.1.tar.gz"
+     - "httpd-2.4.29.tar.gz"
+  when: not st.stat.exists
+   
+- name : move APR-UTIL
+  command: mv /tmp/apache2.4/apr-util-1.6.1 /tmp/apache2.4/httpd-{{HTTPD_VERSION}}/srclib/apr-util 
+  when: not st.stat.exists
+  
+- name : move APR
+  command: mv /tmp/apache2.4/apr-1.6.3 /tmp/apache2.4/httpd-{{HTTPD_VERSION}}/srclib/apr
+  when: not st.stat.exists
+  
+- yum: name=gcc state=present 
+- yum: name=pcre state=present
+- yum: name=pcre-devel state=present
+- yum: name=openssl-devel  state=present
+- yum: name=expat-devel state=present
+   
+- name: Configure httpd
+  command: ./configure --enable-ssl --enable-so --enable-mods-shared=all --with-included-apr --prefix={{INSTALL_DIR}}/apache2.4.29
+  args:
+    chdir: /tmp/apache2.4/httpd-{{HTTPD_VERSION}}
+  when: not st.stat.exists
+  
+- name: make httpd
+  command: make 
+  args:
+    chdir: /tmp/apache2.4/httpd-{{HTTPD_VERSION}}
+  when: not st.stat.exists
+  
+- name: make httpd
+  command: make install
+  args:
+    chdir: /tmp/apache2.4/httpd-{{HTTPD_VERSION}}
+  when: not st.stat.exists
+  
+- name: Downloads Tomcat-Connector
+  get_url: url={{MOD_JK_URL}} dest=/tmp/apache2.4/ 
+  when: not st.stat.exists
+  
+- name: Extract Tomcat-Connector
+  unarchive: src={{item}} dest=/tmp/apache2.4/ copy=no
+  with_items:
+    - "/tmp/apache2.4/tomcat-connectors-1.2.42-src.tar.gz"
+  when: not st.stat.exists
+  
+- name: Configure Tomcat-connector
+  command: ./configure --with-apxs={{INSTALL_DIR}}/apache2.4.29/bin/apxs
+  args:
+    chdir: /tmp/apache2.4/tomcat-connectors-{{TOMCAT_CONNECTOR_VERSION}}-src/native
+  when: not st.stat.exists
+  
+- name: make Tomcat-connector
+  command: make 
+  args:
+    chdir: /tmp/apche2.4/tomcat-connectors-{{TOMCAT_CONNECTOR_VERSION}}-src/native
+  when: not st.stat.exists
+
+- name: make Tomcat-connector
+  command:  make install
+  args:
+    chdir: /tmp/apche2.4/tomcat-connectors-{{TOMCAT_CONNECTOR_VERSION}}-src/native
+  when: not st.stat.exists
+- name: copy configuration httpd files
+  template: src={{item}} dest={{INSTALL_DIR}}/apache2.4.29/conf/
+  with_items:
+    - "httpd.conf"
+    - "mod_jk.conf"
+    - "workers.properties"  
+    
+- name: activate http firewalld 
+  firewalld:  port=80 service=http premanent=true state=enabled zone=public
+     
+- name: activate https firewalld 
+  firewalld:  port=443 service=https premanent=true state=enabled zone=public
+  

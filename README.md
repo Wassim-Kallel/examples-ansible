@@ -1,2 +1,4 @@
-# examples-ansible
-Example ansible , apache2,waf,mailcatcher,postgresql,oraclexe,springboot
+
+Then run the playbook, like this:
+
+	ansible-playbook -i hosts site.yml

@@ -1,0 +1,12 @@
+---
+# This playbook deploys a simple standalone Tomcat 7 server. 
+
+- connection: xxxx
+  user: root
+
+  roles:
+    - app
+    - httpd
+   
+
+     

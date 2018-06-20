@@ -1,0 +1,62 @@
+---
+- name: check tomcat
+  stat: path={{INSTALL_DIR}}/apache-tomcat-{{TOMCAT_VERSION}}/bin
+  register: st
+
+
+- name: Download JRE
+  get_url:
+    url: "{{ JRE_URL }}"
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: "/tmp/"
+  when: not st.stat.exists
+     
+- name: unarchive jre package 
+  unarchive: src=/tmp/jre-8u151-linux-x64.tar.gz dest={{INSTALL_DIR}}/ copy=no
+  when: not st.stat.exists
+   
+- name: Download Tomcat
+  get_url: url={{TOMCAT_HTTP_URL}} dest=/tmp/
+  when: not st.stat.exists
+  
+- name: extract tomcat
+  unarchive: src=/tmp/apache-tomcat-{{TOMCAT_VERSION}}.tar.gz copy=no dest={{INSTALL_DIR}}/
+  when: not st.stat.exists
+     
+- name: Creates directory Log Apache Tomcat
+  file: path={{item}} state=directory  mode=0777
+  when: not st.stat.exists
+  with_items: 
+   - "{{INSTALLED_APPS}}/{{APP_NAME}}/config"
+   - "{{INSTALLED_APPS}}/{{APP_NAME}}/bin"
+   - "{{INSTALLED_APPS}}/{{APP_NAME}}/web"
+   - "{{TOMCAT_LOGS}}"
+  
+  
+- name: Configure Tomcat server
+  template: src={{item}} dest={{INSTALL_DIR}}/apache-tomcat-{{TOMCAT_VERSION}}/conf/
+  with_items: 
+    - "server.xml"
+    - "context.xml"
+    - "logging.properties"
+    - "tomcat-users.xml"
+    
+- name: deleted not used application in apache Tomcat
+  file: path={{INSTALL_DIR}}/apache-tomcat-{{TOMCAT_VERSION}}/{{item}} state=absent
+  with_items:
+  - "docs"
+  - "examples"
+  - "ROOT"
+  - "host-manager"
+  
+- name: copy driver jdbc
+  copy: src=ojdbc7.jar dest={{INSTALL_DIR}}/apache-tomcat-{{TOMCAT_VERSION}}/lib mode=0775  
+  when: not st.stat.exists
+  
+- name: Configure web.xml manager
+  template: src=web.xml dest={{INSTALL_DIR}}/apache-tomcat-{{TOMCAT_VERSION}}/webapps/manager/WEB-INF
+  when: not st.stat.exists
+
+- name: Install Tomcat init script
+  template: src=tomcat-initscript.sh.j2 dest={{INSTALLED_APPS}}/{{APP_NAME}}/bin/tomcat-{{APP_NAME}}.sh mode=0755
+  when: not st.stat.exists

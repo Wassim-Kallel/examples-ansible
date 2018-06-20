@@ -1,0 +1,36 @@
+---
+- name: downloads oracle xe 11g R2 
+  get_url:
+    url: "{{ ORACLE_DB_URL }}"
+    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    dest: "/tmp/"
+
+- name: unarchive oracle xe 
+  unarchive: src=/tmp/oracle-xe-11.2.0-1.0.x86_64.rpm.zip dest=/tmp/ copy=no
+
+- name: install oracle xe
+  command: rpm -ivh oracle-xe-11.2.0-1.0.x86_64.rpm
+  args:
+   chdir: /tmp/Disk1/
+  
+- name: allow machines to call a database oracle
+- command: firewall-cmd --zone=public --add-port=1521/tcp --permanent
+- command: firewall-cmd --reload
+
+- name: copy template in tmp folder
+  template: src=xe.rsp.j2 dest=/tmp/xe.rsp mode=0755
+  
+- name: configure oracle database 
+  command:  /etc/init.d/oracle-xe configure responseFile=/tmp/xe.rsp
+  register: output
+  
+
+- name: configure env oracle
+  command: . ./oracle_env.sh
+  args: 
+   chdir: /u01/app/oracle/product/11.2.0/xe/bin
+   
+- debug: msg={{output.stdout}}
+
+- name: clean tmp folder
+  file: path=/tmp/oracle-xe-11.2.0-1.0.x86_64.rpm.zip state=absent

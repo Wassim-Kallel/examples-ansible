@@ -1,0 +1,24 @@
+- name: Get Webapps in repository
+  get_url: url={{REPOSITORY_URL}} dest=/tmp/
+  when: ( {{action | upper }} == "DEPLOY" )
+  
+- name: Undeploy last application dume in apache tomcat
+  uri:
+    url: "http://{{ADDRESS_SERVICE}}:{{HTTP_PORT}}/manager/text/undeploy?path={{CONTEXT_ROOT}}"
+    method: GET
+    user: "{{ TOMCAT_USER }}"
+    password: "{{ TOMCAT_PASSWORD}}"
+    force_basic_auth: yes
+    status_code: 201
+  
+- name: Deploy a new version application Dume in apache Tomcat 
+  uri:
+    url: "http://{{ADDRESS_SERVICE}}:{{HTTP_PORT}}/manager/text/deploy?war=/tmp/{{APP_NAME}}-{{APP_VERSION}}.war"
+    method: GET
+    user: "{{ TOMCAT_USER }}"
+    password: "{{ TOMCAT_PASSWORD}}"
+    force_basic_auth: yes
+    status_code: 201
+
+
+ 
